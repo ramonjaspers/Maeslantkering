@@ -1,5 +1,6 @@
 import urllib.request
 import urllib.parse
+import urllib.error
 import json
 
 def getRequestJson(httpIP,fileName):
@@ -8,8 +9,10 @@ def getRequestJson(httpIP,fileName):
     the webserver IP and the filename on the webserver. This url is used to request the file.
     """
     url = urllib.parse.urljoin(httpIP,fileName)
-    print(url)
-    response = urllib.request.urlopen(url)
+    try:
+        response = urllib.request.urlopen(url,None,4)
+    except (TimeoutError,urllib.error.URLError):
+        return "Timed out"
     contents = response.read()
     contents = "".join(map(chr, contents))
     jsonfile = json.loads(contents)
@@ -21,7 +24,10 @@ def buienradarApiCall():
     This uses a fair amount of memory as the entire json file is stored in memory and processed multiple times so some
     of the variables are reset to None after use.
     """
-    response = urllib.request.urlopen("https://api.buienradar.nl/data/public/1.1/jsonfeed")
+    try:
+        response = urllib.request.urlopen("https://api.buienradar.nl/data/public/1.1/jsonfeed",None,4)
+    except (TimeoutError,urllib.error.URLError):
+        return "Timed out"
     contents = response.read()
     contents = "".join(map(chr, contents))
     response = None # Clear variable to save memory
