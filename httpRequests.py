@@ -8,8 +8,10 @@ def getRequestJson(httpIP,fileName):
     the webserver IP and the filename on the webserver. This url is used to request the file.
     """
     url = urllib.parse.urljoin(httpIP,fileName)
+    print(url)
     response = urllib.request.urlopen(url)
     contents = response.read()
+    contents = "".join(map(chr, contents))
     jsonfile = json.loads(contents)
     return jsonfile
 
@@ -21,6 +23,7 @@ def buienradarApiCall():
     """
     response = urllib.request.urlopen("https://api.buienradar.nl/data/public/1.1/jsonfeed")
     contents = response.read()
+    contents = "".join(map(chr, contents))
     response = None # Clear variable to save memory
     jsonfile = json.loads(contents)
     contents = None # Clear variable to save memory
