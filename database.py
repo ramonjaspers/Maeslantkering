@@ -15,15 +15,44 @@ except mysql.connector.Error as err:
     else:
         print(err)
 else:
+    insert = 0
+    test = 1
+    
+    if insert == 1:
+        cursor = connection.cursor()
+        """variabele insert"""
+        add_action = ("INSERT INTO History "
+                      "(Status, Waterstand, Windkracht, Windrichting, Instantie) "
+                      "VALUES (%(status)s, %(waterstand)s, %(windkracht)s, %(windrichting)s, %(instantie)s)")
 
-    cursor = connection.cursor()
-    row = cursor.fetchone()
-    query = ("SELECT * FROM History")
-    cursor.execute(query)
+        data_action = {
+            'status': 1,
+            'waterstand': 75,
+            'windkracht': 9,
+            'windrichting': 359,
+            'instantie': "Primair"
+        }
 
-    for row in cursor:
-        print(row)
+        cursor.execute(add_action, data_action) #combineer de data met de query
 
-    print("gelukt?")
+        connection.commit() #Voer de query uit
+
+    """Einde insert"""
+    """Start test"""
+    if test == 1:
+        cursor = connection.cursor()
+        row = cursor.fetchone()
+        query = ("SELECT * FROM History")
+        cursor.execute(query)
+
+        for row in cursor:
+            print(row)
+        """Einde test"""
+    cursor.close()
+    connection.close()
+
+
+
+
     cursor.close()
     connection.close()
