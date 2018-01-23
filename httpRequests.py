@@ -45,5 +45,5 @@ def buienradarApiCall():
     j,jsonfile = None,None # Clear variables to save memory
     return weersdata
 
-print(getRequestJson("http://192.168.42.4","test.json"))
+print(getRequestJson("http://192.168.42.2","test.json"))
 print(buienradarApiCall())
