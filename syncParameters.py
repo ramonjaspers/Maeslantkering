@@ -2,6 +2,7 @@ import json
 from readingJson import syncReadServerJson
 from ping import ping
 from urllib.parse import urlparse
+import urllib.error
 
 def writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall):
     """
@@ -38,15 +39,17 @@ def syncParameters(httpIP,fileName,paramFile):
     """
     ip = urlparse(httpIP)
     ip = ip.netloc
-    if ping(ip).lower() == "online":
-        paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = syncReadServerJson(httpIP,fileName)
-        print(writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall))
-        return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
-    try:
-        paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = readParameters(paramFile)
-        return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
-    except IOError:
-        pass
-        # take default parameters
+    if ping(ip).lower() == "online":        # server check
+        try:                                # try to get the json file from the other server
+            paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = syncReadServerJson(httpIP,fileName)
+            print(writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall))
+            return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
+        except urllib.error.URLError:       # if the url doesn't exist
+            try:                            # try reading from local file
+                paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = readParameters(paramFile)
+                return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
+            except IOError:                 # if local file doesn't exist
+                pass
+                # take default parameters
 
 print(syncParameters("http://192.168.42.4","serverdata.json","./parameters.json"))
