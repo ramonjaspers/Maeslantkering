@@ -45,13 +45,15 @@ def insertIntoDatabase(dataStatus, dataWeerstand, dataWindkracht, dataWindrichti
         status = print("Insert succesful.")
     return status
 
+
 """Closes the connection the the database."""
+
+
 def closeDatabaseConnection():
     cursor.close()  # Shut down the cursor
     connection.close()  # Shut down the connection
     success = print("Connection closed.")
     return success
-
 
 
 #  test data 1, 75, 9, 359, 'Primair'
