@@ -1,4 +1,5 @@
 from httpRequests import getRequestJson
+import urllib.error
 
 def gpioReadServerJson(httpIP1,httpIP2,fileName):
     """
@@ -39,13 +40,15 @@ def syncReadServerJson(httpIP,fileName):
     The function returns the wind direction parameter, the wind speed parameter, the water height parameter and the
     rainfall parameter. It is returned in a tuple in the order listed above.
     """
-    jsonfile = getRequestJson(httpIP,fileName)
-    jsonfile = jsonfile["system"]["parameters"]
-    paramWindDirection = int(jsonfile["windDirection"])
-    paramWindSpeed = int(jsonfile["windSpeed"])
-    paramWaterHeight = int(jsonfile["waterHeight"])
-    paramRainFall = int(jsonfile["rain"])
-    return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
+    try:
+        jsonfile = getRequestJson(httpIP,fileName)
+        paramWindDirection = int(jsonfile["system"]["parameters"]["windDirection"])
+        paramWindSpeed = int(jsonfile["system"]["parameters"]["windSpeed"])
+        paramWaterHeight = int(jsonfile["system"]["parameters"]["waterHeight"])
+        paramRainFall = int(jsonfile["system"]["parameters"]["rain"])
+        return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
+    except (urllib.error.URLError,TypeError):
+        return "Unable to connect"
 
 #print(serverReadGpioJson("http://192.168.42.4","gpiodata.json"))
 #print(syncReadServerJson("http://192.168.42.4","serverdata.json"))

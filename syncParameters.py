@@ -1,7 +1,5 @@
 import json
 from readingJson import syncReadServerJson
-from ping import ping
-from urllib.parse import urlparse
 import urllib.error
 
 def writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall):
@@ -27,7 +25,7 @@ def readParameters(paramFile):
     paramWindDirection = jsonfile["parameters"]["windDirection"]
     paramWindSpeed = jsonfile["parameters"]["windSpeed"]
     paramWaterHeight = jsonfile["parameters"]["waterHeight"]
-    paramRainFall = jsonfile["parameters"]["waterHeight"]
+    paramRainFall = jsonfile["parameters"]["rain"]
     return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
 
 
@@ -37,19 +35,23 @@ def syncParameters(httpIP,fileName,paramFile):
     connection is not established the server will look in a local file for the latest saved parameters. When these
     are not available the system will take default parameters. The parameters are returned in a tuple.
     """
-    ip = urlparse(httpIP)
-    ip = ip.netloc
-    if ping(ip).lower() == "online":        # server check
-        try:                                # try to get the json file from the other server
-            paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = syncReadServerJson(httpIP,fileName)
-            print(writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall))
+    try:                                # try to get the json file from the other server
+        if syncReadServerJson(httpIP,fileName) == "Unable to connect":
+            raise urllib.error.URLError("Unable to conect")
+        paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = syncReadServerJson(httpIP,fileName)
+        print(writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall))
+        return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
+    except (urllib.error.URLError):       # if the url doesn't exist
+        try:                            # try reading from local file
+            paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = readParameters(paramFile)
             return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
-        except urllib.error.URLError:       # if the url doesn't exist
-            try:                            # try reading from local file
-                paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = readParameters(paramFile)
-                return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
-            except IOError:                 # if local file doesn't exist
-                pass
-                # take default parameters
+        except IOError:                 # if local file doesn't exist
+            print("Take default parameters")
+            paramWindDirection = "270"
+            paramWindSpeed = "20"
+            paramWaterHeight = "50"
+            paramRainFall = "150"
+            print(writeParameters(paramFile, paramWindDirection, paramWindSpeed, paramWaterHeight, paramRainFall))
+            return paramWindDirection, paramWindSpeed, paramWaterHeight, paramRainFall
 
-print(syncParameters("http://192.168.42.4","serverdata.json","./parameters.json"))
+print(syncParameters("http://192.168.42.2","serverdata.json","./parameters.json"))
