@@ -54,4 +54,4 @@ def syncParameters(httpIP,fileName,paramFile):
             print(writeParameters(paramFile, paramWindDirection, paramWindSpeed, paramWaterHeight, paramRainFall))
             return paramWindDirection, paramWindSpeed, paramWaterHeight, paramRainFall
 
-print(syncParameters("http://192.168.42.2","serverdata.json","./parameters.json"))
+#print(syncParameters("http://192.168.42.2","serverdata.json","./parameters.json"))

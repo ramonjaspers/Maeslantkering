@@ -21,7 +21,7 @@ def gpioReadServerJson(httpIP1,httpIP2,fileName):
 def serverReadGpioJson(httpIP,fileName):
     """
     This function is run on the server. It requests the json file from the gpio pi and processes the contents.
-    The function returns an integer equal to the minimum height of the water.
+    The function returns a tuple containing the waterHeight integer and gateStatus.
     """
     jsonfile = getRequestJson(httpIP,fileName)
     if jsonfile["system"]["sensors"]["75"] == "0":
@@ -32,7 +32,8 @@ def serverReadGpioJson(httpIP,fileName):
         waterHeight = 25
     else:
         waterHeight = 0
-    return waterHeight
+    gateStatus = jsonfile["system"]["gateStatus"]
+    return waterHeight,gateStatus
 
 def syncReadServerJson(httpIP,fileName):
     """
