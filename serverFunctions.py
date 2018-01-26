@@ -46,4 +46,4 @@ def giveInstruction(serverNum,gpioIP,primaryServerIP):
         instruction = "close"
     else:
         instruction = "open"
-    return writingJson.serverWriteJson(serverNum,activity,instruction,waterHeight,windDirection,windSpeed,rainFall)
+    return writingJson.serverWriteJson(serverNum,activity,instruction,paramWaterHeight,paramWindDirection,paramWindSpeed,paramRainFall)
