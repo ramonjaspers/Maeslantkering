@@ -43,10 +43,10 @@ def syncReadServerJson(httpIP,fileName):
     """
     try:
         jsonfile = getRequestJson(httpIP,fileName)
-        paramWindDirection = int(jsonfile["system"]["parameters"]["windDirection"])
-        paramWindSpeed = int(jsonfile["system"]["parameters"]["windSpeed"])
-        paramWaterHeight = int(jsonfile["system"]["parameters"]["waterHeight"])
-        paramRainFall = int(jsonfile["system"]["parameters"]["rain"])
+        paramWindDirection = str(jsonfile["system"]["parameters"]["windDirection"])
+        paramWindSpeed = str(jsonfile["system"]["parameters"]["windSpeed"])
+        paramWaterHeight = str(jsonfile["system"]["parameters"]["waterHeight"])
+        paramRainFall = str(jsonfile["system"]["parameters"]["rain"])
         return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
     except (urllib.error.URLError,TypeError):
         return "Unable to connect"
