@@ -24,11 +24,11 @@ def makeDatabaseConnection():
 """Insert query function"""
 
 
-def insertIntoDatabase(dataStatus, dataWaterstand, dataWindkracht, dataWindrichting, dataInstatie):
+def insertIntoDatabase(dataStatus, dataWaterstand, dataWindkracht, dataWindrichting, dataInstatie, dataNeerstlag):
     """Prepared query"""
     add_action = ("INSERT INTO History "
-                  "(Status, Waterstand, Windkracht, Windrichting, Instantie) "
-                  "VALUES (%(status)s, %(waterstand)s, %(windkracht)s, %(windrichting)s, %(instantie)s)")
+                  "(Status, Waterstand, Windkracht, Windrichting, Instantie, Neerslag) "
+                  "VALUES (%(status)s, %(waterstand)s, %(windkracht)s, %(windrichting)s, %(instantie)s, %(neerslag)s)")
 
     """Bind varbiales into query"""
     data_action = {
@@ -36,7 +36,8 @@ def insertIntoDatabase(dataStatus, dataWaterstand, dataWindkracht, dataWindricht
         'waterstand': dataWaterstand,
         'windkracht': dataWindkracht,
         'windrichting': dataWindrichting,
-        'instantie': dataInstatie
+        'instantie': dataInstatie,
+        'neerslag': dataNeerstlag
     }
     """Check if query is well executed else catch errors and return them."""
     try:
@@ -61,6 +62,6 @@ def closeDatabaseConnection():
 
 #  test data 1, 75, 9, 359, 'Primair'
 """Executes the function with given data. !position == variable!"""
-#makeDatabaseConnection()
-#insertIntoDatabase(1, 25, 3, 456, 'Primair')
-#closeDatabaseConnection()
+makeDatabaseConnection()
+insertIntoDatabase('open', 25, 3, 456, 1, 80)
+closeDatabaseConnection()
