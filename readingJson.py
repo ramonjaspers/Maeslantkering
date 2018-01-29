@@ -7,13 +7,17 @@ def gpioReadServerJson(httpIP1,httpIP2,fileName):
     the IP of the primary server. httpIP2 is the IP of the secundary. It checks if the server is active, if so it will
     follow its instructions.
     """
-    jsonfile1 = getRequestJson(httpIP1,fileName)
-    jsonfile2 = getRequestJson(httpIP2,fileName)
-    if jsonfile2["system"]["server"]["status"] == "active":
-        instruction = jsonfile2["system"]["instruction"]
-    elif jsonfile1["system"]["server"]["status"] == "active":
-        instruction = jsonfile1["system"]["instruction"]
-    else:
+    try:
+        jsonfile1 = getRequestJson(httpIP1,fileName)
+        jsonfile2 = getRequestJson(httpIP2,fileName)
+        if jsonfile2["system"]["server"]["status"] == "active":
+            instruction = jsonfile2["system"]["instruction"]
+        elif jsonfile1["system"]["server"]["status"] == "active":
+            instruction = jsonfile1["system"]["instruction"]
+        else:
+            print("No instructions could be obtained")
+            instruction = "open"
+    except urllib.error.URLError:
         print("No instructions could be obtained")
         instruction = "open"
     return instruction
