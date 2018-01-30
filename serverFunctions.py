@@ -59,8 +59,13 @@ def giveInstruction(serverNum,primaryServerIP):
         waterHeight,gateStatus = gpioRequest()
         paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = getParameters()
         global buienradarAPI
-        while buienradarAPI == None: # wait for API call if call is not yet made
-            sleep(1)
+        while True: # wait for API call if call is not yet made
+            try:
+                print(buienradarAPI)
+                break
+            except NameError:
+                sleep(1)
+                continue
         windSpeed = buienradarAPI["windsnelheidMS"]
         windDirection = buienradarAPI["windrichtingGR"]
         rainFall = buienradarAPI["regenMMPU"]
