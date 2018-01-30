@@ -100,6 +100,6 @@ def closeDatabaseConnection():
 #     return
 
 
-makeDatabaseConnection()
-print(getHistoryData(dataTuple)
-closeDatabaseConnection()
+#makeDatabaseConnection()
+#print(getHistoryData(dataTuple)
+#closeDatabaseConnection()
