@@ -58,8 +58,9 @@ def insertIntoDatabase(dataStatus, dataWaterstand, dataWindkracht, dataWindricht
     """Krijg gebeurtenis geschiedenis"""
 
 
-def getHistoryData(dataBeginTijd, dataEindTijd):
+def getHistoryData(dataTuple):
     """Prepared query"""
+    dataBeginTijd,dataEindTijd = dataTuple
     add_action = (
         "SELECT DATE_FORMAT(Tijd, '%d-%m-%Y %H:%i') AS Tijd ,Status, Waterstand, Windkracht, Windrichting, Instantie, Neerslag FROM History "
         "WHERE Tijd BETWEEN (%(beginTijd)s) AND (%(eindTijd)s) ORDER BY Tijd DESC")
@@ -100,5 +101,5 @@ def closeDatabaseConnection():
 
 
 makeDatabaseConnection()
-print(getHistoryData(beginDatum, eindDatum))
+print(getHistoryData(dataTuple)
 closeDatabaseConnection()
