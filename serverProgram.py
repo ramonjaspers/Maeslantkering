@@ -39,7 +39,6 @@ def giveInstruction(serverNum,primaryServerIP):
         windSpeed = buienradarAPI["windsnelheidMS"]
         windDirection = buienradarAPI["windrichtingGR"]
         rainFall = buienradarAPI["regenMMPU"]
-        buienradarAPI = None # clear variable
         if paramWaterHeight == "-": # check if the parameter should be disabled
             waterHeightBoolean = False
         else:
