@@ -4,6 +4,9 @@ import readingJson
 import syncParameters
 import ping
 import database
+from time import sleep
+
+# These functions setup the functions for the main program
 
 def serverCheck(primaryServerIP):
     """
@@ -30,6 +33,15 @@ def getParameters():
     paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = syncParameters.readParameters("./parameters.json")
     return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
 
+# These functions should be run in the main program
+
+def doApiCall():
+    """ This function does the API call. It is separate so it can run asynchronous with the giveInstruction function"""
+    global buienradarAPI
+    while True:
+        buienradarAPI = httpRequests.buienradarApiCall()
+        sleep(600)
+
 def giveInstruction(serverNum,gpioIP,primaryServerIP):
     """
     This function checks if the server is the primary server. If so it will always be active. If the server is secundary
@@ -38,37 +50,41 @@ def giveInstruction(serverNum,gpioIP,primaryServerIP):
     will result in an instruction for the gpio pi. The instruction is written to the local webserver. Afterwards a
     connection will be made with the database to write the gathered data to it.
     """
-    if serverNum == 1:
-        activity = "active"
-    else:
-        activity = serverCheck(primaryServerIP)
-    waterHeight,gateStatus = gpioRequest(gpioIP)
-    paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = getParameters()
-    buienradarAPI = httpRequests.buienradarApiCall()
-    windSpeed = buienradarAPI["windsnelheidMS"]
-    windDirection = buienradarAPI["windrichtingGR"]
-    rainFall = buienradarAPI["regenMMPU"]
-    buienradarAPI = None # clear variable
-    if paramWaterHeight == "-": # check if the parameter should be disabled
-        waterHeightBoolean = False
-    else:
-        waterHeightBoolean = waterHeight > paramWaterHeight
-    if paramRainFall == "-": # check if parameter should be disabled
-        rainFallBoolean = False
-    else:
-        rainFallBoolean = rainFall > paramRainFall
-    windRange = range(paramWindDirection - 45, paramWindDirection + 45)
-    windDirectionBoolean = windDirection in windRange
-    if paramWindSpeed == "-": # check if the parameter should be disabled
-        windSpeedBoolean = False
-    else:
-        windSpeedBoolean = windSpeed > paramWindSpeed
-    if waterHeightBoolean | (windDirectionBoolean & windSpeedBoolean) | rainFallBoolean:
-        instruction = "close"
-    else:
-        instruction = "open"
-    writingJson.serverWriteJson(serverNum,activity,instruction,paramWaterHeight,paramWindDirection,paramWindSpeed,paramRainFall)
-    if activity == "active":
-        database.makeDatabaseConnection()
-        database.insertIntoDatabase(gateStatus,waterHeight,windSpeed,windDirection,serverNum,rainFall)
-        database.closeDatabaseConnection()
+    while True:
+        if serverNum == 1:
+            activity = "active" # primary server is always active
+        else:
+            activity = serverCheck(primaryServerIP)
+        waterHeight,gateStatus = gpioRequest(gpioIP)
+        paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = getParameters()
+        global buienradarAPI
+        while buienradarAPI == None: # wait for API call if call is not yet made
+            sleep(1)
+        windSpeed = buienradarAPI["windsnelheidMS"]
+        windDirection = buienradarAPI["windrichtingGR"]
+        rainFall = buienradarAPI["regenMMPU"]
+        buienradarAPI = None # clear variable
+        if paramWaterHeight == "-": # check if the parameter should be disabled
+            waterHeightBoolean = False
+        else:
+            waterHeightBoolean = waterHeight > paramWaterHeight
+        if paramRainFall == "-": # check if parameter should be disabled
+            rainFallBoolean = False
+        else:
+            rainFallBoolean = rainFall > paramRainFall
+        windRange = range(paramWindDirection - 45, paramWindDirection + 45)
+        windDirectionBoolean = windDirection in windRange
+        if paramWindSpeed == "-": # check if the parameter should be disabled
+            windSpeedBoolean = False
+        else:
+            windSpeedBoolean = windSpeed > paramWindSpeed
+        if waterHeightBoolean | (windDirectionBoolean & windSpeedBoolean) | rainFallBoolean:
+            instruction = "close"
+        else:
+            instruction = "open"
+        writingJson.serverWriteJson(serverNum,activity,instruction,paramWaterHeight,paramWindDirection,paramWindSpeed,paramRainFall)
+        if activity == "active":
+            database.makeDatabaseConnection()
+            database.insertIntoDatabase(gateStatus,waterHeight,windSpeed,windDirection,serverNum,rainFall)
+            database.closeDatabaseConnection()
+        sleep(15)
