@@ -1,11 +1,17 @@
 from tkinter import Tk, Canvas, PhotoImage, Label, SUNKEN, RAISED, Frame, Button, Scale, Checkbutton, IntVar, Entry, Toplevel, Text
-import random, time, threading, json
+import random, time, threading
 
+import httpRequests
 from syncParameters import writeParameters
 from httpRequests import buienradarApiCall
-from serverFunctions import doApiCall, giveInstruction
+from serverFunctions import giveInstruction
 
-
+def doApiCall():
+    """ This function does the API call. It is separate so it can run asynchronous with the giveInstruction function"""
+    global buienradarAPI
+    while True:
+        buienradarAPI = httpRequests.buienradarApiCall()
+        time.sleep(600)
 
 def validDateString(dateTimeString):
     try:

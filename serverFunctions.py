@@ -35,14 +35,6 @@ def getParameters():
     return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
 
 # These functions should be run in the main program
-
-def doApiCall():
-    """ This function does the API call. It is separate so it can run asynchronous with the giveInstruction function"""
-    global buienradarAPI
-    while True:
-        buienradarAPI = httpRequests.buienradarApiCall()
-        sleep(600)
-
 def giveInstruction(serverNum,primaryServerIP):
     """
     This function checks if the server is the primary server. If so it will always be active. If the server is secundary
