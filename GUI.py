@@ -266,7 +266,7 @@ def runGui():
     gui = Gui(root)
     gui.pack()
 
-    gui.updateGraph(gui.waterLevelCoords, gui.waterLevelGraph, 'waterLevel', 100)
+    gui.updateGraph(gui.waterLevelCoords, gui.waterLevelGraph, 'waterLevel', 1000)
     gui.updateGraph(gui.rainLevelCoords, gui.rainLevelGraph, 'rainLevel', 600000)
     gui.updateGraph(gui.windDirectionCoords, gui.windDirectionGraph, 'windDirection', 600000)
     gui.updateGraph(gui.windSpeedCoords, gui.windSpeedGraph, 'windSpeed', 600000)
