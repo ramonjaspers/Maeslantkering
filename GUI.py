@@ -1,9 +1,6 @@
 from tkinter import Tk, Canvas, PhotoImage, Label, SUNKEN, RAISED, Frame, Button, Scale, Checkbutton, IntVar, Entry, Toplevel, Text
-from tkinter.messagebox import showinfo
-import random, time, threading
-import urllib.request
-import urllib.parse
-import urllib.error
+import random, time
+from syncParameters import writeParameters
 import json
 
 #example api data
@@ -34,19 +31,6 @@ buienradarAPI = {
     'lonGraden': '4.75',
     }
 
-#function used in gui to write parameters to json file
-def writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall):
-    """
-    This function will take the parameters obtained from the other server and save them to a local file
-    """
-    try:
-        with open(paramFile,"w") as outfile:
-            toWrite = {"parameters":{"windDirection":paramWindDirection,"windSpeed":paramWindSpeed,"waterHeight":
-                                     paramWaterHeight,"rainFall":paramRainFall}}
-            json.dump(toWrite,outfile)
-            return "Write successful"
-    except IOError:
-        return "Unable to write"
 
 def validDateString(dateTimeString):
     try:
@@ -288,23 +272,3 @@ def runGui():
     gui.updateGraph(gui.windSpeedCoords, gui.windSpeedGraph, 'windSpeed', 600000)
     gui.updateStatusLabel(gui.statusLabel)
     root.mainloop()
-
-def runOther():
-    pass
-
-runGui()
-
-
-'''
-t1 = threading.Thread(target=runGui)
-t2 = threading.Thread(target=runOther)
-
-
-t1.start()
-t2.start()
-
-
-t1.join()
-t2.join()
-
-'''
