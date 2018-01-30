@@ -4,6 +4,7 @@ import readingJson
 import syncParameters
 import ping
 import database
+import mysql.connector.errors
 from time import sleep
 
 # These functions setup the functions for the main program
@@ -19,9 +20,9 @@ def serverCheck(primaryServerIP):
         activity = "active"
     return activity
 
-def gpioRequest(gpioIP):
+def gpioRequest():
     """ This function will return a tuple containing the water height integer and gate status string. """
-    waterHeight,gateStatus = readingJson.serverReadGpioJson(gpioIP,"gpiodata.json")
+    waterHeight,gateStatus = readingJson.serverReadGpioJson("http://192.168.42.3","gpiodata.json")
     return waterHeight,gateStatus
 
 def synchroniseParameters(serverIP):
@@ -42,7 +43,7 @@ def doApiCall():
         buienradarAPI = httpRequests.buienradarApiCall()
         sleep(600)
 
-def giveInstruction(serverNum,gpioIP,primaryServerIP):
+def giveInstruction(serverNum,primaryServerIP):
     """
     This function checks if the server is the primary server. If so it will always be active. If the server is secundary
     it will set itself to inactive. All the data is gathered from the gpio pi and the web api and the parameters are
@@ -55,7 +56,7 @@ def giveInstruction(serverNum,gpioIP,primaryServerIP):
             activity = "active" # primary server is always active
         else:
             activity = serverCheck(primaryServerIP)
-        waterHeight,gateStatus = gpioRequest(gpioIP)
+        waterHeight,gateStatus = gpioRequest()
         paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = getParameters()
         global buienradarAPI
         while buienradarAPI == None: # wait for API call if call is not yet made
@@ -67,24 +68,29 @@ def giveInstruction(serverNum,gpioIP,primaryServerIP):
         if paramWaterHeight == "-": # check if the parameter should be disabled
             waterHeightBoolean = False
         else:
-            waterHeightBoolean = waterHeight > paramWaterHeight
+            waterHeightBoolean = int(waterHeight) > int(paramWaterHeight)
         if paramRainFall == "-": # check if parameter should be disabled
             rainFallBoolean = False
         else:
-            rainFallBoolean = rainFall > paramRainFall
-        windRange = range(paramWindDirection - 45, paramWindDirection + 45)
-        windDirectionBoolean = windDirection in windRange
+            if rainFall == "-":
+                rainFall = 0
+            rainFallBoolean = float(rainFall) > int(paramRainFall)
+        windRange = range(int(paramWindDirection) - 45, int(paramWindDirection) + 45)
+        windDirectionBoolean = int(windDirection) in windRange
         if paramWindSpeed == "-": # check if the parameter should be disabled
             windSpeedBoolean = False
         else:
-            windSpeedBoolean = windSpeed > paramWindSpeed
+            windSpeedBoolean = float(windSpeed) > int(paramWindSpeed)
         if waterHeightBoolean | (windDirectionBoolean & windSpeedBoolean) | rainFallBoolean:
             instruction = "close"
         else:
             instruction = "open"
         writingJson.serverWriteJson(serverNum,activity,instruction,paramWaterHeight,paramWindDirection,paramWindSpeed,paramRainFall)
         if activity == "active":
-            database.makeDatabaseConnection()
-            database.insertIntoDatabase(gateStatus,waterHeight,windSpeed,windDirection,serverNum,rainFall)
-            database.closeDatabaseConnection()
+            try:
+                database.makeDatabaseConnection()
+                database.insertIntoDatabase(gateStatus,waterHeight,windSpeed,windDirection,serverNum,rainFall)
+                database.closeDatabaseConnection()
+            except (TimeoutError,mysql.connector.errors.InterfaceError):
+                print("Could not connect to database")
         sleep(15)

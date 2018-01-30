@@ -19,13 +19,20 @@ def readParameters(paramFile):
     """
     This function will read the contents of the local parameter file and process them into a tuple.
     """
-    with open(paramFile,"r") as infile:
-        contents = infile.read()
-    jsonfile = json.loads(contents)
-    paramWindDirection = jsonfile["parameters"]["windDirection"]
-    paramWindSpeed = jsonfile["parameters"]["windSpeed"]
-    paramWaterHeight = jsonfile["parameters"]["waterHeight"]
-    paramRainFall = jsonfile["parameters"]["rain"]
+    try:
+        with open(paramFile,"r") as infile:
+            contents = infile.read()
+        jsonfile = json.loads(contents)
+        paramWindDirection = jsonfile["parameters"]["windDirection"]
+        paramWindSpeed = jsonfile["parameters"]["windSpeed"]
+        paramWaterHeight = jsonfile["parameters"]["waterHeight"]
+        paramRainFall = jsonfile["parameters"]["rain"]
+    except IOError:
+        print("Take default parameters")
+        paramWindDirection = "270"
+        paramWindSpeed = "20"
+        paramWaterHeight = "50"
+        paramRainFall = "150"
     return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
 
 
@@ -42,16 +49,7 @@ def syncParameters(httpIP,fileName,paramFile):
         print(writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall))
         return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
     except (urllib.error.URLError):       # if the url doesn't exist
-        try:                            # try reading from local file
-            paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = readParameters(paramFile)
-            return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
-        except IOError:                 # if local file doesn't exist
-            print("Take default parameters")
-            paramWindDirection = "270"
-            paramWindSpeed = "20"
-            paramWaterHeight = "50"
-            paramRainFall = "150"
-            print(writeParameters(paramFile, paramWindDirection, paramWindSpeed, paramWaterHeight, paramRainFall))
-            return paramWindDirection, paramWindSpeed, paramWaterHeight, paramRainFall
+        paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = readParameters(paramFile)
+        return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall
 
 #print(syncParameters("http://192.168.42.2","serverdata.json","./parameters.json"))
