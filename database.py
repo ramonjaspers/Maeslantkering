@@ -61,7 +61,7 @@ def insertIntoDatabase(dataStatus, dataWaterstand, dataWindkracht, dataWindricht
 def getHistoryData(dataBeginTijd, dataEindTijd):
     """Prepared query"""
     add_action = (
-        "SELECT DATE_FORMAT(Tijd, '%d-%m-%Y %H:%i') ,Status, Waterstand, Windkracht, Windrichting, Instantie, Neerslag FROM History "
+        "SELECT DATE_FORMAT(Tijd, '%d-%m-%Y %H:%i') AS Tijd ,Status, Waterstand, Windkracht, Windrichting, Instantie, Neerslag FROM History "
         "WHERE Tijd BETWEEN (%(beginTijd)s) AND (%(eindTijd)s) ORDER BY Tijd DESC")
 
     """Bind varbiales into query"""
@@ -77,8 +77,6 @@ def getHistoryData(dataBeginTijd, dataEindTijd):
     except TypeError as e:
         status = print(e)
     else:
-
-        # status = print(rows)
         status = rows
     return status
 
@@ -92,17 +90,15 @@ def closeDatabaseConnection():
     success = print("Connection closed.")
     return success
 
-
-def getDateValues(status):
-    for row in status:
-        for key in row:
-            print(row[key], end=" ")
-        print("")
-    return
+#
+# def getDateValues(status):
+#     for row in status:
+#         for key in row:
+#             print(row[key], end=" ")
+#         print(row)
+#     return
 
 
 makeDatabaseConnection()
-status = getHistoryData(beginDatum, eindDatum)
-getDateValues(status)
-
+print(getHistoryData(beginDatum, eindDatum))
 closeDatabaseConnection()
