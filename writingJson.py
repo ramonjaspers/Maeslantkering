@@ -1,4 +1,4 @@
-    import json
+import json
 
 def serverWriteJson(serverNumber, serverStatus, instruction, waterHeight, windDirection, windSpeed, rain):
     """
