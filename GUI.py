@@ -4,6 +4,8 @@ from syncParameters import writeParameters
 import json
 
 #example api data
+
+'''
 buienradarAPI = {
     '@id': '6344',
     'stationcode': '6344',
@@ -30,6 +32,7 @@ buienradarAPI = {
     'latGraden': '52.58',
     'lonGraden': '4.75',
     }
+'''
 
 
 def validDateString(dateTimeString):
@@ -49,6 +52,7 @@ class Gui(Frame):
         Frame.__init__(self, master)
 
         self.pack()
+        global buienradarAPI
 
         #define master variables (geometry and background)
         master.geometry('{}x{}'.format(1600, 900))
