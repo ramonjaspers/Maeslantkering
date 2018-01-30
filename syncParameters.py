@@ -26,7 +26,7 @@ def readParameters(paramFile):
         paramWindDirection = jsonfile["parameters"]["windDirection"]
         paramWindSpeed = jsonfile["parameters"]["windSpeed"]
         paramWaterHeight = jsonfile["parameters"]["waterHeight"]
-        paramRainFall = jsonfile["parameters"]["rain"]
+        paramRainFall = jsonfile["parameters"]["rainFall"]
     except IOError:
         print("Take default parameters")
         paramWindDirection = "270"

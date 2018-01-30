@@ -166,7 +166,7 @@ class Gui(Frame):
 
         windDirectionParameter = self.windDirectionSlider.get()
 
-        writeParameters('params.json', windDirectionParameter,windSpeedParameter,  waterheightParameter,rainLevelParameter)
+        writeParameters('./parameters.json', windDirectionParameter,windSpeedParameter,  waterheightParameter,rainLevelParameter)
 
     #function used to
     def updateYCoordList(self, list, type):
@@ -256,7 +256,7 @@ print(type(buienradarAPI))
 
 t1 = threading.Thread(target=doApiCall)
 
-t2 = threading.Thread(target=giveInstruction, args=(1,"192.168.42.3","192.168.42.1"))
+t2 = threading.Thread(target=giveInstruction, args=(1,"192.168.42.1"))
 
 t3 = threading.Thread(target=runGui)
 
