@@ -1,11 +1,9 @@
 from tkinter import Tk, Canvas, PhotoImage, Label, SUNKEN, RAISED, Frame, Button, Scale, Checkbutton, IntVar, Entry, Toplevel, Text
-import random, time, threading
+import random, time, threading, mysql.connector.errors
 
-import httpRequests
-import serverFunctions
+import writingJson, database, httpRequests, serverFunctions
 from syncParameters import writeParameters
 from httpRequests import buienradarApiCall
-from serverFunctions import giveInstruction
 
 def doApiCall():
     """ This function does the API call. It is separate so it can run asynchronous with the giveInstruction function"""
@@ -36,7 +34,7 @@ def giveInstruction(serverNum,primaryServerIP):
                 print(buienradarAPI)
                 break
             except NameError:
-                sleep(1)
+                time.sleep(1)
                 continue
         windSpeed = buienradarAPI["windsnelheidMS"]
         windDirection = buienradarAPI["windrichtingGR"]
@@ -70,7 +68,7 @@ def giveInstruction(serverNum,primaryServerIP):
                 database.closeDatabaseConnection()
             except (TimeoutError,mysql.connector.errors.InterfaceError):
                 print("Could not connect to database")
-        sleep(15)
+        time.sleep(15)
 
 def validDateString(dateTimeString):
     try:
