@@ -22,7 +22,7 @@ def serverCheck(primaryServerIP):
 
 def gpioRequest():
     """ This function will return a tuple containing the water height integer and gate status string. """
-    waterHeight,gateStatus = readingJson.serverReadGpioJson("http://192.168.42.3","gpiodata.json")
+    waterHeight,gateStatus = readingJson.serverReadGpioJson("192.168.42.3","gpiodata.json")
     return waterHeight,gateStatus
 
 def synchroniseParameters(serverIP):
