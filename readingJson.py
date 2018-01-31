@@ -31,10 +31,11 @@ def serverReadGpioJson(httpIP,fileName):
     waterHeight = 0
     gateStatus = "open"
     try:
+        print(jsonfile)
         print("sensordata right after obtaining values:")
-        print(jsonfile["system"]["sensors"]["75"])
-        print(jsonfile["system"]["sensors"]["50"])
-        print(jsonfile["system"]["sensors"]["25"])
+        print("sensor75",jsonfile["system"]["sensors"]["75"])
+        print("sensor50",jsonfile["system"]["sensors"]["50"])
+        print("sensor25",jsonfile["system"]["sensors"]["25"])
         if jsonfile["system"]["sensors"]["75"] == "0":
             waterHeight = 75
         elif jsonfile["system"]["sensors"]["50"] == "0":
