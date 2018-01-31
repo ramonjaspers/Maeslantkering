@@ -32,4 +32,6 @@ def synchroniseParameters(serverIP):
 def getParameters():
     """ This function reads the parameters that are stored on the device """
     paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = syncParameters.readParameters("./parameters.json")
+    print("WindDir: "+str(paramWindDirection)+" WindSpd: "+str(paramWindSpeed)+" WaterHeight: "
+          +str(paramWaterHeight)+" RainFall: "+str(paramRainFall))
     return paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall

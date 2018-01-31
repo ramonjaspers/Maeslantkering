@@ -2,6 +2,7 @@ from tkinter import Tk, Canvas, PhotoImage, Label, SUNKEN, RAISED, Frame, Button
 import random, time, threading, mysql.connector.errors
 
 import writingJson, database, httpRequests, serverFunctions
+from ping import ping
 from syncParameters import writeParameters
 from httpRequests import buienradarApiCall
 
@@ -10,10 +11,14 @@ def doApiCall():
     global buienradarAPI
     while True:
         buienradarAPI = httpRequests.buienradarApiCall()
-        time.sleep(600)
+        try:
+            time.sleep(600)
+        except KeyboardInterrupt: # catch keyboard interrupts
+            print("Stopped")
+            break
 
 # These functions should be run in the main program
-def giveInstruction(serverNum,primaryServerIP):
+def giveInstruction(serverNum,primaryServerIP,secundaryServerIP):
     """
     This function checks if the server is the primary server. If so it will always be active. If the server is secundary
     it will set itself to inactive. All the data is gathered from the gpio pi and the web api and the parameters are
@@ -21,53 +26,78 @@ def giveInstruction(serverNum,primaryServerIP):
     will result in an instruction for the gpio pi. The instruction is written to the local webserver. Afterwards a
     connection will be made with the database to write the gathered data to it.
     """
-    while True:
+    global buienradarAPI  # set buienradarAPI to be global variable
+    # on the secundary server sync parameters with primary
+    if serverNum == 2:
+        if ping(primaryServerIP) == "Online":
+            serverFunctions.synchroniseParameters(primaryServerIP)
+    # on the primary server sync parameters with the secundary
+    elif serverNum == 1:
+        if ping (secundaryServerIP) == "Online":
+            serverFunctions.synchroniseParameters(secundaryServerIP)
+    while True: # loop until the program gets interrupted
         if serverNum == 1:
             activity = "active" # primary server is always active
-        else:
+        elif serverNum == 2: # sync parameters if the server is inactive
             activity = serverFunctions.serverCheck(primaryServerIP)
-        waterHeight,gateStatus = serverFunctions.gpioRequest()
-        paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = serverFunctions.getParameters()
-        global buienradarAPI
+            if activity == "active":
+                print("server active")
+            elif activity == "inactive":
+                print("server inactive")
+                serverFunctions.synchroniseParameters(primaryServerIP)
+        waterHeight,gateStatus = serverFunctions.gpioRequest() # request gpio data
+        paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = serverFunctions.getParameters() # get parms
+        # print parameters obtained obtained by this function
+        print("Main obtained parameters: ",paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall)
         while True: # wait for API call if call is not yet made
             try:
-                print(buienradarAPI)
+                print(buienradarAPI) # try to print buienradarAPI (raises exception if its None)
                 break
-            except NameError:
+            except (NameError,ValueError,TypeError):
+                print("API call not yet made")
                 time.sleep(1)
                 continue
+        # get data from API (API call is made asynchronous on another thread, see function doApiCall())
         windSpeed = buienradarAPI["windsnelheidMS"]
         windDirection = buienradarAPI["windrichtingGR"]
         rainFall = buienradarAPI["regenMMPU"]
         if paramWaterHeight == "-": # check if the parameter should be disabled
             waterHeightBoolean = False
         else:
-            waterHeightBoolean = int(waterHeight) > int(paramWaterHeight)
+            waterHeightBoolean = int(waterHeight) >= int(paramWaterHeight)
         if paramRainFall == "-": # check if parameter should be disabled
             rainFallBoolean = False
         else:
             if rainFall == "-":
                 rainFall = 0
-            rainFallBoolean = float(rainFall) > int(paramRainFall)
+            rainFallBoolean = float(rainFall) >= int(paramRainFall)
+        # set up a boolean for wind data to be in range with parameters
         windRange = range(int(paramWindDirection) - 45, int(paramWindDirection) + 45)
         windDirectionBoolean = int(windDirection) in windRange
         if paramWindSpeed == "-": # check if the parameter should be disabled
             windSpeedBoolean = False
         else:
-            windSpeedBoolean = float(windSpeed) > int(paramWindSpeed)
+            windSpeedBoolean = float(windSpeed) >= int(paramWindSpeed)
+        # give instruction
         if waterHeightBoolean | (windDirectionBoolean & windSpeedBoolean) | rainFallBoolean:
             instruction = "close"
         else:
             instruction = "open"
+        # write instruction to webserver
         writingJson.serverWriteJson(serverNum,activity,instruction,paramWaterHeight,paramWindDirection,paramWindSpeed,paramRainFall)
+        # save data to database if server is active server
         if activity == "active":
             try:
                 database.makeDatabaseConnection()
                 database.insertIntoDatabase(gateStatus,waterHeight,windSpeed,windDirection,serverNum,rainFall)
                 database.closeDatabaseConnection()
-            except (TimeoutError,mysql.connector.errors.InterfaceError):
+            except (TimeoutError,mysql.connector.errors.InterfaceError): # except connection errors
                 print("Could not connect to database")
-        time.sleep(15)
+        try: # catch keyboard interrupts
+            time.sleep(15)
+        except KeyboardInterrupt:
+            print("Stopped")
+            break
 
 def validDateString(dateTimeString):
     try:
@@ -317,9 +347,7 @@ print(type(buienradarAPI))
 
 
 t1 = threading.Thread(target=doApiCall)
-
-t2 = threading.Thread(target=giveInstruction, args=(1,"192.168.42.1"))
-
+t2 = threading.Thread(target=giveInstruction, args=(1,"192.168.42.1","192.168.42.4"))
 t3 = threading.Thread(target=runGui)
 
 
