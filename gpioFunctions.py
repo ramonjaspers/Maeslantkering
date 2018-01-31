@@ -70,7 +70,7 @@ while True:
     print("Gate status: " + gateStatus)
     try:
         instruction = gpioReadServerJson("192.168.42.1","192.168.42.4","serverdata.json")
-        instruction
+        print(instruction)
     except TypeError:
         print("No json file from server")
         instruction = "open"
