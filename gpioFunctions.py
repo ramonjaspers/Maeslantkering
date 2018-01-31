@@ -64,11 +64,17 @@ while True:
     gateClass.update_variables()
     gpioWriteJson(sensor25,sensor50,sensor75,gateStatus)
     time.sleep(waitTime)
+    print("Sensor 25: " + str(sensor25))
+    print("Sensor 50: " + str(sensor50))
+    print("Sensor 75: " + str(sensor75))
+    print("Gate status: " + gateStatus)
     try:
-        instruction = gpioReadServerJson("192.168.42.3","192.168.42.4","serverdata.json")
+        instruction = gpioReadServerJson("192.168.42.1","192.168.42.4","serverdata.json")
+        instruction
     except TypeError:
         print("No json file from server")
         instruction = "open"
+    print(instruction)
     if gateStatus == "closed" and instruction == "open":
         gateClass.open_gate(rotations)
     # If the gate is opened and isnt opening or closing, check if it should close
