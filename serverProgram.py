@@ -1,7 +1,7 @@
 from tkinter import Tk, Canvas, PhotoImage, Label, SUNKEN, RAISED, Frame, Button, Scale, Checkbutton, IntVar, Entry, Toplevel, Text
 import random, time, threading, mysql.connector.errors
 
-import writingJson, database, httpRequests, serverFunctions
+import writingJson, database, httpRequests, serverFunctions, readingJson
 from ping import ping
 from syncParameters import writeParameters
 from httpRequests import buienradarApiCall
@@ -222,6 +222,22 @@ class Gui(Frame):
         string = self.getHistoryString()
         self.create_window('Historie', string)
 
+    def getHistoryWindowTextString(self, data):
+        formatString = '| {:17}| {:9}| {:12}| {:11}| {:13}| {:7}| {:9}|'
+        string = ''
+        titles = formatString.format('Tijd', 'Status', 'Waterstand', 'Windkracht', 'Windrichting', 'Server', 'Neerslag')
+        string += titles + '\n'
+
+        for item in data:
+            string += formatString.format(data[data.index(item)]['Tijd'], data[data.index(item)]['Status'],
+                                          str(data[data.index(item)]['Waterstand']),
+                                          str(data[data.index(item)]['Windkracht']),
+                                          str(data[data.index(item)]['Windrichting']),
+                                          str(data[data.index(item)]['Instantie']),
+                                          str(data[data.index(item)]['Neerslag'])) + '\n'
+
+        return string
+
     def getHistoryString(self):
         self.startEntryString = self.historyStartEntry.get()
         self.endEntryString = self.historyEndEntry.get()
@@ -229,10 +245,19 @@ class Gui(Frame):
 
         if validDateString(self.startEntryString) == True:
             if validDateString(self.endEntryString) == True:
-                if time.mktime(time.strptime(self.startEntryString, '%Y-%m-%d %H:%M')) <= time.mktime(time.strptime(self.endEntryString, '%Y-%m-%d %H:%M')):
-                    returnValue = (self.startEntryString, self.endEntryString)
+                if time.mktime(time.strptime(self.startEntryString, '%Y-%m-%d %H:%M')) < time.mktime(time.strptime(self.endEntryString, '%Y-%m-%d %H:%M')):
+                    dateTuple = (self.startEntryString, self.endEntryString)
+                    historyData = database.getHistoryData(dateTuple)
+                    returnValue = self.getHistoryWindowTextString(historyData)
+
+                else:
+                    returnValue = 'Begintijd gelijk aan of later dan eindtijd'
+                    print(validDateString(self.endEntryString))
+            else:
+
+                returnValue = 'Eindtijd onjuist'
         else:
-            returnValue = 'allemaal problemen'
+            returnValue = 'Begintijd onjuist'
         print('functie doorlopen')
         print(returnValue)
         return returnValue
@@ -302,8 +327,19 @@ class Gui(Frame):
         canvas.after(miliseconds, self.updateGraph, list, canvas, type, miliseconds)
 
     def updateStatusLabel(self, label):
-        label.configure(text=random.randint(0, 9))
-        label.after(100, self.updateStatusLabel, label)
+        text = self.getKeringStatus()
+        label.configure(text=text)
+        label.after(250, self.updateStatusLabel, label)
+
+    def getKeringStatus(self):
+        try:
+            data = serverFunctions.gpioRequest()
+            statusString = 'status:' + data[1]
+            return statusString
+        except:
+            return 'ERROR'
+
+
 
     def getRainLevelYCoord(self):
         rainLevel = buienradarAPI['regenMMPU']
@@ -323,7 +359,8 @@ class Gui(Frame):
         return windDirectionY
 
     def getWaterLevelYCoord(self):
-        return 50
+        data = serverFunctions.gpioRequest()
+        return data[0]*2
 
 
 def runGui():
