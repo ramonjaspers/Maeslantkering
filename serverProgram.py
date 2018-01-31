@@ -46,6 +46,8 @@ def giveInstruction(serverNum,primaryServerIP,secundaryServerIP):
                 print("server inactive")
                 serverFunctions.synchroniseParameters(primaryServerIP)
         waterHeight,gateStatus = serverFunctions.gpioRequest() # request gpio data
+        print("Water height for gate calc:",waterHeight)
+        print("Gate status for gate calculation:",gateStatus)
         paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = serverFunctions.getParameters() # get parms
         # print parameters obtained obtained by this function
         print("Main obtained parameters: ",paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall)
@@ -212,7 +214,7 @@ class Gui(Frame):
     def create_window(self, title, text):
         t = Toplevel(self)
         t.wm_title(title)
-        i = Text(t, relief="flat", height=50, width=70)
+        i = Text(t, relief="flat", height=50, width=93)
         i.insert(1.0, text)
         i.config(state='disabled')
         print(text)
