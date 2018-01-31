@@ -12,7 +12,7 @@ GPIO.setwarnings(False)
 GPIO.setup(2, GPIO.IN)  # Sensor 25
 GPIO.setup(3, GPIO.IN)  # Sensor 50
 GPIO.setup(4, GPIO.IN)  # Sensor 75
-GPIO.setup(17, GPIO.OUT)  # Poort
+GPIO.setup(17, GPIO.OUT)  # P+oort
 gate = GPIO.PWM(17, 50)
 GPIO.setup(27, GPIO.OUT)  # Alarm lamp
 
@@ -47,7 +47,7 @@ class gateClass:
         gate.ChangeDutyCycle(0)
         gateStatus = "closed"
 
-    def update_variables(self):
+    def update_variables():
         global sensor50, sensor25, sensor75
         # variable is 0 when touching water and 1 when dry
         sensor25 = GPIO.input(2)
@@ -64,7 +64,11 @@ while True:
     gateClass.update_variables()
     gpioWriteJson(sensor25,sensor50,sensor75,gateStatus)
     time.sleep(waitTime)
-    instruction = gpioReadServerJson("http://192.168.42.3","http://192.168.42.4","serverdata.json")
+    try:
+        instruction = gpioReadServerJson("http://192.168.42.3","http://192.168.42.4","serverdata.json")
+    except TypeError:
+        print("No json file from server")
+        instruction = "open"
     if gateStatus == "closed" and instruction == "open":
         gateClass.open_gate(rotations)
     # If the gate is opened and isnt opening or closing, check if it should close
