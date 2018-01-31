@@ -22,7 +22,7 @@ rotations = 27
 sensor25 = GPIO.input(2)
 sensor50 = GPIO.input(3)
 sensor75 = GPIO.input(4)
-waitTime = 15
+waitTime = 10
 gate.start(0)
 
 # Define some classes:
