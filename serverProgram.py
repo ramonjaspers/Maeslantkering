@@ -247,7 +247,7 @@ class Gui(Frame):
             if validDateString(self.endEntryString) == True:
                 if time.mktime(time.strptime(self.startEntryString, '%Y-%m-%d %H:%M')) < time.mktime(time.strptime(self.endEntryString, '%Y-%m-%d %H:%M')):
                     dateTuple = (self.startEntryString, self.endEntryString)
-                    historyData = database.getHistoryData(dateTuple)
+                    historyData = database.getHistory(dateTuple)
                     returnValue = self.getHistoryWindowTextString(historyData)
 
                 else:

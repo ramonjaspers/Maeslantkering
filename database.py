@@ -81,6 +81,11 @@ def getHistoryData(dataTuple):
         status = rows
     return status
 
+def getHistory(dataTuple):
+    makeDatabaseConnection()
+    data = getHistoryData(dataTuple)
+    closeDatabaseConnection()
+    return data
 
 """Closes the connection the the database."""
 
