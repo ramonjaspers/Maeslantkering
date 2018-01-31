@@ -18,32 +18,33 @@ GPIO.setup(27, GPIO.OUT)  # Alarm lamp
 
 # Define some global variables that are used throughout the script
 gateStatus = "open"
-rotations = 35
+rotations = 27
 sensor25 = GPIO.input(2)
 sensor50 = GPIO.input(3)
 sensor75 = GPIO.input(4)
 waitTime = 15
+gate.start(0)
 
 # Define some classes:
 
 # De gate class, here the TI stuff gets defined
 class gateClass:
     def open_gate(duration):
-        global gateStatus
+        global gateStatus, gate
         gateStatus = "opening"
-        gpioWriteJson(sensor25,sensor50,sensor75,gateStatus)
-        gate.start(10)
-        time.sleep(duration)
-        gate.stop()
-        gateStatus = "open"
-
-    def close_gate(duration):
-        global gateStatus
-        gateStatus = "closing"
         gpioWriteJson(sensor25,sensor50,sensor75,gateStatus)
         gate.ChangeDutyCycle(5)
         time.sleep(duration)
-        gate.stop()
+        gate.ChangeDutyCycle(0)
+        gateStatus = "open"
+
+    def close_gate(duration):
+        global gateStatus, gate
+        gateStatus = "closing"
+        gpioWriteJson(sensor25,sensor50,sensor75,gateStatus)
+        gate.ChangeDutyCycle(10)
+        time.sleep(duration)
+        gate.ChangeDutyCycle(0)
         gateStatus = "closed"
 
     def update_variables(self):
@@ -61,9 +62,6 @@ class gateClass:
 while True:
     # The script waits a couple of seconds before executing the while loop again
     gateClass.update_variables()
-    sensor25 = GPIO.input(2)
-    sensor50 = GPIO.input(3)
-    sensor75 = GPIO.input(4)
     gpioWriteJson(sensor25,sensor50,sensor75,gateStatus)
     time.sleep(waitTime)
     instruction = gpioReadServerJson("http://192.168.42.3","http://192.168.42.4","serverdata.json")
