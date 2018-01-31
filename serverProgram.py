@@ -94,7 +94,7 @@ def giveInstruction(serverNum,primaryServerIP,secundaryServerIP):
             except (TimeoutError,mysql.connector.errors.InterfaceError): # except connection errors
                 print("Could not connect to database")
         try: # catch keyboard interrupts
-            time.sleep(15)
+            time.sleep(10)
         except KeyboardInterrupt:
             print("Stopped")
             break
@@ -371,7 +371,7 @@ def runGui():
     gui = Gui(root)
     gui.pack()
 
-    gui.updateGraph(gui.waterLevelCoords, gui.waterLevelGraph, 'waterLevel', 1000)
+    gui.updateGraph(gui.waterLevelCoords, gui.waterLevelGraph, 'waterLevel', 10000)
     gui.updateGraph(gui.rainLevelCoords, gui.rainLevelGraph, 'rainLevel', 600000)
     gui.updateGraph(gui.windDirectionCoords, gui.windDirectionGraph, 'windDirection', 600000)
     gui.updateGraph(gui.windSpeedCoords, gui.windSpeedGraph, 'windSpeed', 600000)
