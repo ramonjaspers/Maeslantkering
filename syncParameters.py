@@ -1,6 +1,6 @@
 import json
 from readingJson import syncReadServerJson
-import urllib.error
+import urllib.error, urllib.parse
 
 def writeParameters(paramFile,paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall):
     """

@@ -3,11 +3,12 @@ import urllib.parse
 import urllib.error
 import json
 
-def getRequestJson(httpIP,fileName):
+def getRequestJson(ip,fileName):
     """
     Return the data from a json file, requested from a local webserver running on another device. A url is formed from
     the webserver IP and the filename on the webserver. This url is used to request the file.
     """
+    httpIP = "http://"+ip
     url = urllib.parse.urljoin(httpIP,fileName)
     try:
         response = urllib.request.urlopen(url,None,4)
