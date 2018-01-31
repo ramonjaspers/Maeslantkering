@@ -50,16 +50,10 @@ def giveInstruction(serverNum,primaryServerIP,secundaryServerIP):
         # print parameters obtained obtained by this function
         print("Main obtained parameters: ",paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall)
         while True: # wait for API call if call is not yet made
-            #try:
-                #print(buienradarAPI) # try to print buienradarAPI (raises exception if its None)
-                #break
-            #except (NameError,ValueError,TypeError):
-                #print("API call not yet made")
-                #time.sleep(1)
-                #continue
-            if buienradarAPI in globals():
+            try:
+                print(buienradarAPI) # try to print buienradarAPI (raises exception if its None)
                 break
-            else:
+            except (NameError,ValueError,TypeError):
                 print("API call not yet made")
                 time.sleep(1)
                 continue
