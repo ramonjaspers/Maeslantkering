@@ -65,7 +65,7 @@ while True:
     gpioWriteJson(sensor25,sensor50,sensor75,gateStatus)
     time.sleep(waitTime)
     try:
-        instruction = gpioReadServerJson("http://192.168.42.3","http://192.168.42.4","serverdata.json")
+        instruction = gpioReadServerJson("192.168.42.3","192.168.42.4","serverdata.json")
     except TypeError:
         print("No json file from server")
         instruction = "open"
