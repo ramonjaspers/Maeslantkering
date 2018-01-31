@@ -46,16 +46,20 @@ def giveInstruction(serverNum,primaryServerIP,secundaryServerIP):
                 print("server inactive")
                 serverFunctions.synchroniseParameters(primaryServerIP)
         waterHeight,gateStatus = serverFunctions.gpioRequest() # request gpio data
-        print("Water height for gate calc:",waterHeight)
-        print("Gate status for gate calculation:",gateStatus)
         paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall = serverFunctions.getParameters() # get parms
         # print parameters obtained obtained by this function
         print("Main obtained parameters: ",paramWindDirection,paramWindSpeed,paramWaterHeight,paramRainFall)
         while True: # wait for API call if call is not yet made
-            try:
-                print(buienradarAPI) # try to print buienradarAPI (raises exception if its None)
+            #try:
+                #print(buienradarAPI) # try to print buienradarAPI (raises exception if its None)
+                #break
+            #except (NameError,ValueError,TypeError):
+                #print("API call not yet made")
+                #time.sleep(1)
+                #continue
+            if buienradarAPI in globals():
                 break
-            except (NameError,ValueError,TypeError):
+            else:
                 print("API call not yet made")
                 time.sleep(1)
                 continue

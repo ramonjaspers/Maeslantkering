@@ -31,24 +31,17 @@ def serverReadGpioJson(httpIP,fileName):
     waterHeight = 0
     gateStatus = "open"
     try:
-        print(jsonfile)
-        print("sensordata right after obtaining values:")
-        print("sensor75",jsonfile["system"]["sensors"]["75"])
-        print("sensor50",jsonfile["system"]["sensors"]["50"])
-        print("sensor25",jsonfile["system"]["sensors"]["25"])
-        if jsonfile["system"]["sensors"]["75"] == "0":
+        if str(jsonfile["system"]["sensors"]["75"]) == "0":
             waterHeight = 75
-        elif jsonfile["system"]["sensors"]["50"] == "0":
+        elif str(jsonfile["system"]["sensors"]["50"]) == "0":
             waterHeight = 50
-        elif jsonfile["system"]["sensors"]["25"] == "0":
+        elif str(jsonfile["system"]["sensors"]["25"]) == "0":
             waterHeight = 25
         else:
             waterHeight = 0
         gateStatus = jsonfile["system"]["gateStatus"]
     except TypeError:
         print("No gpio json file could be obtained, returning default height and status.")
-    print("Water Height after processing:",str(waterHeight))
-    print("Gate status after processing:",gateStatus)
     return waterHeight,gateStatus
 
 def syncReadServerJson(httpIP,fileName):
