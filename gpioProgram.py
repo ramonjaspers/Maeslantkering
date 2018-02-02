@@ -17,12 +17,12 @@ gate = GPIO.PWM(17, 50)
 GPIO.setup(27, GPIO.OUT)  # Alarm lamp
 
 # Define some global variables that are used throughout the script
-gateStatus = "open"
-rotations = 29
+gateStatus = "open" # starting gate status is open
+rotations = 29 # rotate 29 seconds
 sensor25 = GPIO.input(2)
 sensor50 = GPIO.input(3)
 sensor75 = GPIO.input(4)
-waitTime = 10
+waitTime = 10 # time to wait between loops
 gate.start(0)
 
 # Define some classes:
