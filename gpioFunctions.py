@@ -18,7 +18,7 @@ GPIO.setup(27, GPIO.OUT)  # Alarm lamp
 
 # Define some global variables that are used throughout the script
 gateStatus = "open"
-rotations = 27
+rotations = 29
 sensor25 = GPIO.input(2)
 sensor50 = GPIO.input(3)
 sensor75 = GPIO.input(4)
