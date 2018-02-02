@@ -111,7 +111,6 @@ def validDateString(dateTimeString):
 
 #gui class
 class Gui(Frame):
-    counter = 0
     def __init__(self, master):
         Frame.__init__(self, master)
 
@@ -209,6 +208,7 @@ class Gui(Frame):
         checksList.append(windSpeedConfigCheck)
         return checksList
 
+    #function use to create window with title and text as argument
     def create_window(self, title, text):
         t = Toplevel(self)
         t.wm_title(title)
@@ -218,10 +218,12 @@ class Gui(Frame):
         print(text)
         i.pack()
 
+    #function used to show the historywindow
     def showHistoryWindow(self):
         string = self.getHistoryString()
         self.create_window('Historie', string)
 
+    #function used to format the data from the database into a string for the database
     def getHistoryWindowTextString(self, data):
         formatString = '| {:17}| {:9}| {:12}| {:11}| {:13}| {:7}| {:9}|'
         string = ''
@@ -238,6 +240,7 @@ class Gui(Frame):
 
         return string
 
+    #function used to generate the textstring for the history window
     def getHistoryString(self):
         self.startEntryString = self.historyStartEntry.get()
         self.endEntryString = self.historyEndEntry.get()
@@ -285,7 +288,7 @@ class Gui(Frame):
 
         writeParameters('./parameters.json', windDirectionParameter,windSpeedParameter,  waterheightParameter,rainLevelParameter)
 
-    #function used to
+    #function used to update the list with y-coordinates for the tkinter canvaess
     def updateYCoordList(self, list, type):
         if type == 'rainLevel':
             list.append(self.getRainLevelYCoord())
@@ -308,6 +311,7 @@ class Gui(Frame):
             list.remove(list[0])
         return list
 
+    #function used to draw a graph using tkinter canvas module with a list of y-coordinates and a canvas as arguments
     def drawGraph(self, list, canvas):
         canvas.delete('all')
         startX = 0
@@ -322,15 +326,18 @@ class Gui(Frame):
             canvas.create_line(startX, startY, endX, endY)
             startX += 100
 
+    #function used to update graph with graph type and update interval as arguments
     def updateGraph(self, list, canvas, type, miliseconds):
         self.drawGraph(self.updateYCoordList(list, type), canvas)
         canvas.after(miliseconds, self.updateGraph, list, canvas, type, miliseconds)
 
+    #function used to update statuslabel ever quarter of a second
     def updateStatusLabel(self, label):
         text = self.getKeringStatus()
         label.configure(text=text)
         label.after(250, self.updateStatusLabel, label)
 
+    #function used to get the status of the kering from the gpio system
     def getKeringStatus(self):
         try:
             data = serverFunctions.gpioRequest()
@@ -340,7 +347,7 @@ class Gui(Frame):
             return 'ERROR'
 
 
-
+    #function used to generate y-coordinate for rainFall
     def getRainLevelYCoord(self):
         rainLevel = buienradarAPI['regenMMPU']
         if rainLevel == '-':
@@ -348,21 +355,24 @@ class Gui(Frame):
         rainLevelY = int(float(rainLevel) * 1.388888888888889)
         return rainLevelY
 
+    #function used to generate y-coordinate for wind speed
     def getWindSpeedYCoord(self):
         windSpeed = buienradarAPI['windsnelheidMS']
         windSpeedY = int(float(windSpeed) * 5)
         return windSpeedY
 
+    #function used to generate y-coordinate for wind direction
     def getWindDirectionYCoord(self):
         windDirection = buienradarAPI['windrichtingGR']
         windDirectionY = int(float(windDirection) * 0.4)
         return windDirectionY
 
+    #function used to generate y-coordinate for water level
     def getWaterLevelYCoord(self):
         data = serverFunctions.gpioRequest()
         return data[0]*2
 
-
+#function used to run the gui loop.
 def runGui():
     global root, gui
 
