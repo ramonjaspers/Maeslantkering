@@ -8,14 +8,14 @@ def getRequestJson(ip,fileName):
     Return the data from a json file, requested from a local webserver running on another device. A url is formed from
     the webserver IP and the filename on the webserver. This url is used to request the file.
     """
-    httpIP = "http://"+ip
+    httpIP = "http://"+ip # create url
     url = urllib.parse.urljoin(httpIP,fileName)
     try:
         response = urllib.request.urlopen(url,None,4)
     except (TimeoutError,urllib.error.URLError):
         return "Timed out"
     contents = response.read()
-    contents = "".join(map(chr, contents))
+    contents = "".join(map(chr, contents)) # convert binary to string
     jsonfile = json.loads(contents)
     return jsonfile
 
@@ -30,7 +30,7 @@ def buienradarApiCall():
     except (TimeoutError,urllib.error.URLError):
         return "Timed out"
     contents = response.read()
-    contents = "".join(map(chr, contents))
+    contents = "".join(map(chr, contents)) # convert binary to string
     response = None # Clear variable to save memory
     jsonfile = json.loads(contents)
     contents = None # Clear variable to save memory
