@@ -31,6 +31,3 @@ def gpioWriteJson(sensor25,sensor50,sensor75,gateStatus):
     except IOError:
         log = "Couldn't write to file"
     return log
-
-#print(serverWriteJson("1","active","open","50","270","6","50")) # testline
-#print(gpioWriteJson("0","1","1","open")) # testline
